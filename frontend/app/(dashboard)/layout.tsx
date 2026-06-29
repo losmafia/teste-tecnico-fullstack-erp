@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { api } from '../../services/api';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
@@ -13,6 +13,7 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const router = useRouter();
+    const pathname = usePathname();
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -82,11 +83,11 @@ export default function DashboardLayout({
                 </div>
 
                 <nav className="flex-1 space-y-4 w-full">
-                    <Link href="/clientes" className={`flex items-center text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors rounded-md hover:bg-gray-50 dark:hover:bg-slate-800/50 ${isCollapsed ? 'justify-center text-2xl py-2' : 'gap-3 px-3 py-2 text-base'}`} title="Clientes">
+                    <Link href="/clientes" className={`flex items-center transition-colors rounded-md ${pathname.startsWith('/clientes') ? 'bg-orange-50 dark:bg-slate-800 text-orange-600 dark:text-orange-500 font-bold shadow-sm border border-orange-100 dark:border-slate-700' : 'text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 hover:bg-gray-50 dark:hover:bg-slate-800/50'} ${isCollapsed ? 'justify-center text-2xl py-2' : 'gap-3 px-3 py-2 text-base'}`} title="Clientes">
                         <span>👥</span>
                         {!isCollapsed && <span>Clientes</span>}
                     </Link>
-                    <Link href="/pedidos" className={`flex items-center text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 transition-colors rounded-md hover:bg-gray-50 dark:hover:bg-slate-800/50 ${isCollapsed ? 'justify-center text-2xl py-2' : 'gap-3 px-3 py-2 text-base'}`} title="Pedidos">
+                    <Link href="/pedidos" className={`flex items-center transition-colors rounded-md ${pathname.startsWith('/pedidos') ? 'bg-orange-50 dark:bg-slate-800 text-orange-600 dark:text-orange-500 font-bold shadow-sm border border-orange-100 dark:border-slate-700' : 'text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-orange-400 hover:bg-gray-50 dark:hover:bg-slate-800/50'} ${isCollapsed ? 'justify-center text-2xl py-2' : 'gap-3 px-3 py-2 text-base'}`} title="Pedidos">
                         <span>📦</span>
                         {!isCollapsed && <span>Pedidos</span>}
                     </Link>
