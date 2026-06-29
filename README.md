@@ -104,7 +104,7 @@ Orders:
 - Adicionar cache nos endpoints mais acessados.
 
 ## Declaração sobre o uso de IA
-O uso de ferramentas de inteligência artificial foi feito de maneira pontual e assistencial ao longo de todo o projeto. As principais finalidades foram:
+O uso de ferramentas de inteligência artificial(ANTIGRAVITY - GEMINI) foi feito de maneira pontual e assistencial ao longo de todo o projeto. As principais finalidades foram:
 - Agilidade na estruturação base de sintaxe do Dockerfile e docker-compose.
 - Revisão ortográfica e auxílio na documentação técnica deste projeto (pontuação e formalização).
 Ressalto que toda a concepção arquitetônica, o design e o refino final das regras de negócio foram implementados, controlados e validados por mim, visando assegurar total domínio sobre a solução.
