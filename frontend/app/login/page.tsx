@@ -126,7 +126,7 @@ export default function LoginPage() {
 
       <footer className="w-full px-8 py-4 grid grid-cols-1 sm:grid-cols-3 items-center text-slate-400 text-xs font-medium relative z-10 gap-4 sm:gap-0">
         <div className="hidden sm:block"></div>
-        <p className="text-center">© 2026 Matheus Rocha Ribeiro © Dev Pleno - RIOPAE</p>
+        <p className="text-center">© 2026 Matheus Rocha Ribeiro © - RIOPAE</p>
         <div className="flex items-center justify-center sm:justify-end gap-4">
 
           <Link href="https://github.com/losmafia/teste-tecnico-fullstack-erp/" className="hover:text-slate-800 transition-colors">
