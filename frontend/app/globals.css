@@ -1,18 +1,22 @@
 @import "tailwindcss";
 
-
+/* 
+  Sobrescreve a media query nativa do Tailwind v4 
+  para permitir alternar o Dark Mode através de classes CSS (.dark)
+*/
+@custom-variant dark (&:is(.dark *));
 
 @layer base {
   :root {
     --background: #ffffff;
     --foreground: #171717;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --background: #0a0a0a;
-      --foreground: #ededed;
-    }
+  .dark {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    color-scheme: dark;
   }
+  
   body {
     background-color: var(--background);
     color: var(--foreground);

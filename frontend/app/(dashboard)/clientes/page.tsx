@@ -93,16 +93,16 @@ export default function ClientesPage() {
     };
 
     return (
-        <div className="space-y-6 relative">
+        <div className="space-y-6 relative transition-colors">
             {/* Cabeçalho e Botão de Ação */}
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-gray-800">Clientes</h1>
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Clientes</h1>
 
                 {/* REGRA DE NEGÓCIO VISUAL: Só ADMIN enxerga o botão */}
                 {userRole === "ADMIN" && (
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition font-medium shadow-sm"
+                        className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
                     >
                         + Novo Cliente
                     </button>
@@ -110,61 +110,61 @@ export default function ClientesPage() {
             </div>
 
             {/* Filtros de Busca */}
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex gap-4">
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 flex gap-4 transition-colors">
                 <input
                     type="text"
                     placeholder="Buscar por nome..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="border border-gray-300 rounded-md px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                    className="bg-transparent border border-gray-300 dark:border-slate-600 rounded-md px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                 />
                 <select 
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
-                    className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                    className="bg-transparent border border-gray-300 dark:border-slate-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 text-gray-900 dark:text-gray-100 transition-colors"
                 >
-                    <option value="">Todos os Status</option>
-                    <option value="ATIVO">Ativos</option>
-                    <option value="INATIVO">Inativos</option>
+                    <option value="" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Todos os Status</option>
+                    <option value="ATIVO" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Ativos</option>
+                    <option value="INATIVO" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">Inativos</option>
                 </select>
             </div>
 
             {/* Tabela de Clientes */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="bg-gray-50 text-gray-600 border-b text-sm">
+                        <tr className="bg-gray-50 dark:bg-slate-700/50 text-gray-600 dark:text-gray-300 border-b dark:border-slate-700 text-sm transition-colors">
                             <th className="p-4 font-medium">Nome</th>
                             <th className="p-4 font-medium">Documento</th>
                             <th className="p-4 font-medium text-center">Status</th>
                             <th className="p-4 font-medium text-right">Ações</th>
                         </tr>
                     </thead>
-                    <tbody className="text-sm text-gray-700">
+                    <tbody className="text-sm text-gray-700 dark:text-gray-300">
                         {loading ? (
                             <tr>
-                                <td colSpan={4} className="p-8 text-center text-gray-500">
+                                <td colSpan={4} className="p-8 text-center text-gray-500 dark:text-gray-400">
                                     Carregando clientes...
                                 </td>
                             </tr>
                         ) : customers.length === 0 ? (
                             <tr>
-                                <td colSpan={4} className="p-8 text-center text-gray-500">
+                                <td colSpan={4} className="p-8 text-center text-gray-500 dark:text-gray-400">
                                     Nenhum cliente cadastrado.
                                 </td>
                             </tr>
                         ) : (
                             customers.map((customer) => (
-                                <tr key={customer.id} className="border-b hover:bg-gray-50 transition-colors">
-                                    <td className="p-4 font-medium">
+                                <tr key={customer.id} className="border-b dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors">
+                                    <td className="p-4 font-medium text-gray-900 dark:text-gray-100">
                                         {customer.name}
-                                        <div className="text-xs text-gray-400 font-normal">{customer.email}</div>
+                                        <div className="text-xs text-gray-400 dark:text-gray-500 font-normal">{customer.email}</div>
                                     </td>
-                                    <td className="p-4">{customer.document}</td>
+                                    <td className="p-4 text-gray-600 dark:text-gray-400">{customer.document}</td>
                                     <td className="p-4 text-center">
                                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${customer.status === "ATIVO"
-                                            ? "bg-green-100 text-green-700"
-                                            : "bg-red-100 text-red-700"
+                                            ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                                            : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                                             }`}>
                                             {customer.status === "ATIVO" ? "Ativo" : "Inativo"}
                                         </span>
@@ -175,14 +175,14 @@ export default function ClientesPage() {
                                             <button
                                                 onClick={() => handleToggleStatus(customer.id, customer.status)}
                                                 className={`font-medium transition-colors ${customer.status === "ATIVO"
-                                                    ? "text-red-500 hover:text-red-700"
-                                                    : "text-blue-500 hover:text-blue-700"
+                                                    ? "text-orange-500 hover:text-orange-600 dark:text-orange-400 dark:hover:text-orange-300"
+                                                    : "text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                                                     }`}
                                             >
                                                 {customer.status === "ATIVO" ? "Inativar" : "Ativar"}
                                             </button>
                                         ) : (
-                                            <span className="text-gray-400 text-xs cursor-not-allowed bg-gray-100 px-2 py-1 rounded">
+                                            <span className="text-gray-400 dark:text-gray-500 text-xs cursor-not-allowed bg-gray-100 dark:bg-slate-800 px-2 py-1 rounded">
                                                 Restrito
                                             </span>
                                         )}
@@ -196,13 +196,13 @@ export default function ClientesPage() {
 
             {/* Modal de Cadastro de Cliente */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                            <h2 className="text-lg font-semibold text-gray-800">Cadastrar Novo Cliente</h2>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity">
+                    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-md overflow-hidden border border-gray-100 dark:border-slate-700">
+                        <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Cadastrar Novo Cliente</h2>
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="text-gray-400 hover:text-gray-600 text-xl"
+                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl transition-colors"
                             >
                                 &times;
                             </button>
@@ -211,36 +211,36 @@ export default function ClientesPage() {
                         {/* Integração do form com a função de criar */}
                         <form onSubmit={handleCreateCustomer} className="p-6 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Empresa / Cliente</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome da Empresa / Cliente</label>
                                 <input
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                                    className="w-full bg-transparent border border-gray-300 dark:border-slate-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                                     placeholder="Ex: Tech Solutions S.A"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Documento (CPF/CNPJ)</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Documento (CPF/CNPJ)</label>
                                 <input
                                     type="text"
                                     value={document}
                                     onChange={(e) => setDocument(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                                    className="w-full bg-transparent border border-gray-300 dark:border-slate-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                                     placeholder="00.000.000/0000-00"
                                     required
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">E-mail Corporativo</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail Corporativo</label>
                                 <input
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                                    className="w-full bg-transparent border border-gray-300 dark:border-slate-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
                                     placeholder="contato@empresa.com"
                                     required
                                 />
@@ -250,13 +250,13 @@ export default function ClientesPage() {
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition font-medium"
+                                    className="px-4 py-2 text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-slate-700 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors font-medium"
                                 >
                                     Cancelar
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition font-medium shadow-sm"
+                                    className="px-4 py-2 text-white bg-blue-600 dark:bg-blue-500 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800"
                                 >
                                     Salvar Cliente
                                 </button>
