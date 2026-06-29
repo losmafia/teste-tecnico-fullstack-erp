@@ -2,7 +2,7 @@ import { createClient } from 'redis';
 
 // Cria a instância de conexão apontando para o seu Docker local
 const redisClient = createClient({
-    url: 'redis://localhost:6379'
+    url: process.env.REDIS_URL || 'redis://localhost:6379'
 });
 
 // Captura erros para o servidor não "capotar" se o Redis cair
