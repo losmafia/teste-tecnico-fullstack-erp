@@ -1,13 +1,50 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from 'next/image';
 import Link from 'next/link';
+import { api } from "../../services/api";
 
-// Componente principal da Tela de Login
-// Responsável pela renderização da interface de autenticação do usuário.
-// Futuramente, as chamadas para a API (ex: POST /api/auth/login) serão feitas a partir deste formulário.
 export default function LoginPage() {
+  const router = useRouter();
+
+  // Estados de controle do formulário
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [erro, setErro] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Função que dispara ao clicar em "Entrar"
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErro("");
+    setLoading(true);
+
+    try {
+      const response = await api.post("/auth/login", {
+        username,
+        password
+      });
+
+      const { token, user } = response.data;
+
+      localStorage.setItem("erp_token", token);
+      localStorage.setItem("erp_user", JSON.stringify(user));
+
+      router.push("/clientes");
+
+    } catch (error: any) {
+      const mensagemBackend = error.response?.data?.error || "Erro de comunicação com o servidor.";
+      setErro(mensagemBackend);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans relative overflow-hidden text-slate-900">
-      
+
       {/* Efeitos decorativos de fundo (UI Premium) */}
       <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-[80px] pointer-events-none" />
@@ -24,15 +61,15 @@ export default function LoginPage() {
 
       <main className="flex-1 flex items-center justify-center p-4 relative z-10 min-h-0">
         <div className="w-full max-w-[420px] bg-white/80 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-3xl p-8 border border-white">
-          
+
           <div className="flex flex-col items-center text-center mb-6">
             <div className="mb-4 relative">
               <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-lg border-4 border-white bg-white">
-                <Image 
-                  src="/riopae.jpg" 
-                  alt="RioPae Logo" 
-                  width={64} 
-                  height={64} 
+                <Image
+                  src="/riopae.jpg"
+                  alt="RioPae Logo"
+                  width={64}
+                  height={64}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -43,8 +80,15 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form className="space-y-4">
-            {/* Aqui será feita a coleta de dados e integração com as tabelas de usuários do banco (via endpoint) para validação de acesso */}
+          <form onSubmit={handleLogin} className="space-y-4">
+
+            {/* Bloco de Erro Renderizado Condicionalmente */}
+            {erro && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm text-center">
+                {erro}
+              </div>
+            )}
+
             <div>
               <label htmlFor="username" className="block text-xs font-medium text-slate-700 mb-1">
                 Usuário / Email
@@ -52,8 +96,10 @@ export default function LoginPage() {
               <input
                 type="text"
                 id="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-slate-900 text-sm transition-all placeholder:text-slate-400 hover:bg-white focus:bg-white focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
-                placeholder="Endereço de e-mail"
+                placeholder="Usuario ou Endereço de e-mail"
                 required
               />
             </div>
@@ -65,30 +111,21 @@ export default function LoginPage() {
               <input
                 type="password"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-slate-900 text-sm transition-all placeholder:text-slate-400 hover:bg-white focus:bg-white focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10"
                 placeholder="Digite sua senha"
                 required
               />
             </div>
 
-            <div className="flex items-center pt-1">
-              <input
-                id="remember_me"
-                name="remember_me"
-                type="checkbox"
-                className="h-3.5 w-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500/30 transition-colors"
-              />
-              <label htmlFor="remember_me" className="ml-2 block text-xs text-slate-600">
-                Mantenha-me conectado.
-              </label>
-            </div>
-
             <div className="pt-2">
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-orange-500 shadow-md hover:shadow-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-0.5"
+                disabled={loading}
+                className="group relative w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-orange-500 shadow-md hover:shadow-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Entrar
+                {loading ? "Entrando..." : "Entrar"}
               </button>
             </div>
           </form>
