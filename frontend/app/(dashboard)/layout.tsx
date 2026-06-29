@@ -1,6 +1,7 @@
 "use client"; // Adicionado porque agora lidamos com cliques e localStorage
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { api } from '../../services/api';
 import { useTheme } from 'next-themes';
@@ -38,9 +39,9 @@ export default function DashboardLayout({
 
             {/* Barra Lateral Expansível */}
             <aside className={`${isCollapsed ? 'w-20' : 'w-64'} relative transition-all duration-300 bg-white dark:bg-slate-950 text-gray-800 dark:text-white p-4 flex flex-col border-r border-gray-200 dark:border-slate-800 z-10`}>
-                
+
                 {/* Botão de Colapsar (posicionado na borda) */}
-                <button 
+                <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
                     className="absolute -right-3 top-8 bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-md hover:bg-orange-600 focus:outline-none transition-transform z-20"
                     title={isCollapsed ? "Expandir Menu" : "Recolher Menu"}
@@ -48,11 +49,35 @@ export default function DashboardLayout({
                     <span className="text-xs leading-none">{isCollapsed ? '▶' : '◀'}</span>
                 </button>
 
-                <div className="mb-8 mt-2 flex items-center justify-center h-8">
+                <div className="mb-8 mt-2 flex items-center h-16 w-full bg-gray-100 dark:bg-slate-900/50 p-2 rounded-xl border border-gray-200 dark:border-slate-800 transition-all duration-300">
                     {!isCollapsed ? (
-                        <h2 className="text-2xl font-bold text-orange-500 whitespace-nowrap overflow-hidden">Rio Pae ERP</h2>
+                        <div className="flex items-center gap-3 w-full overflow-hidden">
+                            <div className="w-12 h-12 rounded-lg overflow-hidden shadow-sm flex-shrink-0 border border-white dark:border-slate-700">
+                                <Image
+                                    src="/riopae.jpg"
+                                    alt="RioPae Logo"
+                                    width={48}
+                                    height={48}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                            <div className="flex flex-col justify-center overflow-hidden">
+                                <h2 className="text-base font-black text-slate-800 dark:text-white leading-tight tracking-wide">
+                                    RIO<span className="text-orange-500">PAE</span>
+                                </h2>
+                                <span className="text-xs text-slate-500 font-semibold uppercase tracking-widest mt-0.5">Painel</span>
+                            </div>
+                        </div>
                     ) : (
-                        <h2 className="text-2xl font-bold text-orange-500">RP</h2>
+                        <div className="w-12 h-12 rounded-lg overflow-hidden shadow-sm flex-shrink-0 mx-auto border border-white dark:border-slate-700 transition-all duration-300">
+                            <Image
+                                src="/riopae.jpg"
+                                alt="RioPae Logo"
+                                width={48}
+                                height={48}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
                     )}
                 </div>
 
@@ -90,7 +115,7 @@ export default function DashboardLayout({
             <main className="flex-1 flex flex-col overflow-hidden">
                 <header className="bg-white dark:bg-slate-800 shadow-sm border-b border-gray-200 dark:border-slate-700 p-4 flex justify-between items-center transition-colors">
                     <h1 className="text-gray-700 dark:text-gray-200 font-semibold">Painel de Controle</h1>
-                    
+
                     {/* Theme Toggle Button */}
                     {mounted && (
                         <button
