@@ -2,7 +2,7 @@
 
 🌟 **Demonstração Online:** [https://teste-tecnico-fullstack-erp.vercel.app](https://teste-tecnico-fullstack-erp.vercel.app)  
 *(Você pode usar o usuário `admin` e a senha `123` para acessar a versão online)*
- *(Ferramentas utilizadas: Vercel + Render + Supabase)*
+*(Ferramentas utilizadas: Vercel + Render + Supabase)*
 
 ## Descrição do Projeto
 Este projeto é um simulador de módulo de ERP como teste no processo Seletivo para vaga de fullstack RioPae com foco na gestão de clientes e pedidos. Ele contempla a autenticação, controle de permissões por perfil (Administrador e Operador), regras de negócios específicas (ex.: bloqueio de pedidos para clientes inativos). A aplicação foi desenvolvida considerando performance, segurança e uma arquitetura separada entre Frontend e Backend.
