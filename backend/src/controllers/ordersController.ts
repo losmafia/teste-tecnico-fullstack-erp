@@ -8,12 +8,12 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-// 1. Criar Pedido (POST /api/orders)
+// criando um novo pedido
 export const createOrder = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { customerId, items } = req.body;
 
-        // Regra 1: Pedido precisa ter pelo menos 1 item
+        // validando se o pedido tem itens
         if (!items || !Array.isArray(items) || items.length === 0) {
             res.status(400).json({ error: 'O pedido precisa ter pelo menos 1 item.' });
             return;
@@ -28,7 +28,7 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
             return;
         }
 
-        // Regra 4: Cliente inativo não pode receber pedido
+        // cliente inativo nao pode fazer pedido
         if (customer.status === 'INATIVO') {
             res.status(400).json({ error: 'Não é permitido criar pedidos para clientes inativos.' });
             return;
@@ -36,7 +36,7 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
 
         let totalValue = 0;
 
-        // Regras 2, 3 e 5: Valida quantidades, valores unitários e calcula o total no backend
+        // validando as quantidades e somando o total
         for (const item of items) {
             if (!item.quantity || item.quantity <= 0) {
                 res.status(400).json({ error: 'A quantidade do item deve ser maior que zero.' });
@@ -49,7 +49,7 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
             totalValue += item.quantity * item.unitPrice;
         }
 
-        // Cria o pedido e os itens simultaneamente
+        // salvando tudo no banco de uma vez
         const order = await prisma.order.create({
             data: {
                 customerId: customer.id,
@@ -74,10 +74,26 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
     }
 };
 
-// 2. Listar Todos os Pedidos (GET /api/orders)
+// pegando todos os pedidos
 export const getOrders = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
+        const { customerName, status } = req.query;
+        const where: any = {};
+
+        // busca pelo nome ignorando case
+        if (customerName) {
+            where.customer = {
+                name: { contains: String(customerName), mode: 'insensitive' }
+            };
+        }
+        
+        // busca pelo status exato
+        if (status) {
+            where.status = String(status).toUpperCase();
+        }
+
         const orders = await prisma.order.findMany({
+            where,
             include: {
                 customer: { select: { name: true, document: true } },
                 items: true,
@@ -86,11 +102,12 @@ export const getOrders = async (req: AuthRequest, res: Response): Promise<void> 
         });
         res.status(200).json(orders);
     } catch (error) {
+        console.error('Erro ao buscar pedidos:', error);
         res.status(500).json({ error: 'Erro ao buscar pedidos.' });
     }
 };
 
-// 3. Buscar Pedido por ID (GET /api/orders/:id)
+// buscando pedido especifico pelo ID
 export const getOrderById = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
@@ -110,5 +127,69 @@ export const getOrderById = async (req: AuthRequest, res: Response): Promise<voi
         res.status(200).json(order);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao buscar o pedido.' });
+    }
+};
+
+// atualizando o status do pedido
+export const updateOrderStatus = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        // so o admin pode fazer isso
+        if (req.user?.role !== 'ADMIN') {
+            res.status(403).json({ error: 'Acesso negado: Apenas administradores podem alterar o status do pedido.' });
+            return;
+        }
+
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const validStatuses = ['DRAFT', 'CONFIRMED', 'CANCELLED'];
+        if (!validStatuses.includes(status)) {
+            res.status(400).json({ error: 'Status inválido. Use DRAFT, CONFIRMED ou CANCELLED.' });
+            return;
+        }
+
+        const order = await prisma.order.update({
+            where: { id: String(id) },
+            data: { status },
+        });
+
+        res.status(200).json(order);
+    } catch (error) {
+        console.error('Erro ao atualizar status do pedido:', error);
+        res.status(500).json({ error: 'Erro ao atualizar o status do pedido.' });
+    }
+};
+
+// apagando o pedido
+export const deleteOrder = async (req: AuthRequest, res: Response): Promise<void> => {
+    try {
+        if (req.user?.role !== 'ADMIN') {
+            res.status(403).json({ error: 'Acesso negado.' });
+            return;
+        }
+
+        const { id } = req.params;
+
+        // verificando se o pedido existe
+        const order = await prisma.order.findUnique({ where: { id: String(id) } });
+
+        if (!order) {
+            res.status(404).json({ error: 'Pedido não encontrado.' });
+            return;
+        }
+
+        if (order.status !== 'DRAFT') {
+            res.status(400).json({ error: 'Apenas pedidos com status DRAFT (Rascunho) podem ser excluídos.' });
+            return;
+        }
+
+        // apagando os itens primeiro pra nao dar erro de FK
+        await prisma.orderItem.deleteMany({ where: { orderId: String(id) } });
+        await prisma.order.delete({ where: { id: String(id) } });
+
+        res.status(200).json({ message: 'Pedido excluído com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao excluir pedido:', error);
+        res.status(500).json({ error: 'Erro ao excluir o pedido.' });
     }
 };

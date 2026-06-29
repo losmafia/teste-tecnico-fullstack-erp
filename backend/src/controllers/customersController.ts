@@ -9,34 +9,32 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-// 1. Listar Clientes
+// listando clientes do banco
 export const getCustomers = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         const { name, status } = req.query;
         const hasFilters = name || status;
         const cacheKey = 'customers_list_all';
 
-        // ESTRATÉGIA DE CACHE: Só usamos o Redis se o usuário não enviou filtros de busca
+        // se o cara nao buscou nada especifico, pega do redis
         if (!hasFilters) {
             const cachedData = await redisClient.get(cacheKey);
             if (cachedData) {
-                // Se achou no Redis, devolve direto (super rápido!)
-                console.log('📦 Retornando clientes do CACHE (Redis)');
+                // retornando do cache pra ficar mais rapido
                 res.status(200).json(JSON.parse(cachedData));
                 return;
             }
         }
 
-        console.log('🗄️ Buscando clientes no BANCO DE DADOS (PostgreSQL)');
+        // se tem filtro, busca no postgres
         const where: any = {};
         if (name) where.name = { contains: String(name), mode: 'insensitive' };
         if (status) where.status = String(status).toUpperCase();
 
         const customers = await prisma.customer.findMany({ where });
 
-        // Salva no Redis apenas se for a lista completa
+        // salvando no cache por 60 seg se for a lista toda
         if (!hasFilters) {
-            // SETEX: Salva a chave, coloca TTL de 60 segundos e insere os dados
             await redisClient.setEx(cacheKey, 60, JSON.stringify(customers));
         }
 
@@ -47,7 +45,7 @@ export const getCustomers = async (req: AuthRequest, res: Response): Promise<voi
     }
 };
 
-// 2. Cadastrar Cliente
+// cadastrando um novo cliente
 export const createCustomer = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         if (req.user?.role !== 'ADMIN') {
@@ -61,7 +59,7 @@ export const createCustomer = async (req: AuthRequest, res: Response): Promise<v
             data: { name, document, email, status: 'ATIVO' },
         });
 
-        // INVALIDAÇÃO: Deleta o cache porque a lista de clientes mudou
+        // limpa o cache pq a lista mudou
         await redisClient.del('customers_list_all');
 
         res.status(201).json(customer);
@@ -70,7 +68,7 @@ export const createCustomer = async (req: AuthRequest, res: Response): Promise<v
     }
 };
 
-// 3. Atualizar Status
+// atualizando status do cliente
 export const updateCustomerStatus = async (req: AuthRequest, res: Response): Promise<void> => {
     try {
         if (req.user?.role !== 'ADMIN') {
@@ -86,7 +84,7 @@ export const updateCustomerStatus = async (req: AuthRequest, res: Response): Pro
             data: { status },
         });
 
-        // INVALIDAÇÃO: Deleta o cache porque o status de um cliente mudou
+        // limpando cache de novo
         await redisClient.del('customers_list_all');
 
         res.status(200).json(customer);

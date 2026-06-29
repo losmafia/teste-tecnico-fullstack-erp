@@ -10,35 +10,36 @@ const prisma = new PrismaClient({ adapter });
 
 export const login = async (req: Request, res: Response): Promise<void> => {
     try {
-        // 1. Recebe os dados do corpo da requisição (pode vir como email ou username)
+        // Inicio do codigo de login
+        // pegando os dados do front
         const { email, username, password } = req.body;
         const loginIdentifier = username || email;
 
-        // 2. Valida se os campos foram enviados
+        // verificando se mandou tudo
         if (!loginIdentifier || !password) {
             res.status(400).json({ error: 'Usuário/Email e senha são obrigatórios' });
             return;
         }
 
-        // 3. Busca o usuário no banco de dados mapeando para username
+        // procurando o usuario no banco
         const user = await prisma.user.findUnique({
             where: { username: loginIdentifier },
         });
 
-        // 4. Validação da senha (simples, comparando texto puro conforme o seed)
+        // checando se a senha bate
         if (!user || user.password !== password) {
             res.status(401).json({ error: 'Credenciais inválidas' });
             return;
         }
 
-        // 5. Gera o Token JWT contendo o ID e a role (admin ou operador)
+        // criando o token de acesso
         const token = jwt.sign(
             { id: user.id, role: user.role },
             process.env.JWT_SECRET as string,
-            { expiresIn: '1d' } // Expira em 1 dia
+            { expiresIn: '1d' } 
         );
 
-        // 6. Retorna o token e os dados básicos do usuário
+        // deu tudo certo, retornando o token
         res.status(200).json({
             message: 'Login realizado com sucesso',
             token,
@@ -52,4 +53,10 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         console.error('Erro no login:', error);
         res.status(500).json({ error: 'Erro interno no servidor' });
     }
+};
+
+// logout do sistema
+export const logout = async (req: Request, res: Response): Promise<void> => {
+    // O logout real acontece no frontend limpando o localStorage (JWT Stateless)
+    res.status(200).json({ message: 'Logout realizado com sucesso' });
 };
