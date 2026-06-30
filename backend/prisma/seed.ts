@@ -11,7 +11,10 @@ async function main() {
     // Criar o usuário Administrador
     await prisma.user.upsert({
         where: { username: 'admin' },
-        update: {},
+        update: {
+            password: '123',
+            role: 'ADMIN',
+        },
         create: {
             username: 'admin',
             password: '123', // Senha simples em texto puro (aceitável para o escopo deste teste)
@@ -22,7 +25,10 @@ async function main() {
     // Criar o usuário Operador
     await prisma.user.upsert({
         where: { username: 'operador' },
-        update: {},
+        update: {
+            password: '123',
+            role: 'OPERATOR',
+        },
         create: {
             username: 'operador',
             password: '123',
